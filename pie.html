@@ -1,0 +1,114 @@
+<!-- Code from d3-graph-gallery.com, http://bl.ocks.org/dbuezas/9306799
+https://jsfiddle.net/user2314737/kvz8uev8/, 
+
+-->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<script>
+
+// set the dimensions and margins of the graph
+var width = 450
+    height = 450
+    margin = 40
+
+// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+var radius = Math.min(width, height) / 2 - margin
+
+// append the svg object to the div called 'my_dataviz'
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+// parsing data
+d3.csv("https://gist.githubusercontent.com/dingmei/d1ab5dd8ff9597d71b3fba3dc26347fe/raw/31229a7b96e75fd53281c9ec4a3eb6671b42a179/ucsd_cds_admission_data_2005_to_2018", function(error, data) {
+  if (error) throw error;
+
+
+data.forEach(function(d){
+  d.year = +d.year;
+  d.fulltime_men_applied = +d.fulltime_men_applied.replace(',','');
+  d.fulltime_women_applied= +d.fulltime_women_applied.replace(',','');
+  d.fulltime_men_admitted= +d.fulltime_men_admitted.replace(',','');
+  d.fulltime_women_admitted= +d.fulltime_women_admitted.replace(',','');
+  d.fulltime_men_enrolled= +d.fulltime_men_enrolled.replace(',','');
+  d.fulltime_women_enrolled= +d.fulltime_women_enrolled.replace(',','');
+});
+
+// set the color scale
+var color = d3.scaleOrdinal()
+  .domain(data)
+  .range([ "#7b6888", "#6b486b", "#a05d56", "#0000FF",
+    "#00FFFF", "#2F4F4F", "#8FBC8F", " #FF69B4", "#CD5C5C", "#4B0082"," #FFFFF0", "#FFA07A", "#20B2AA", "#800000", "#BA55D3"])
+
+console.log(data.year)
+// Compute the position of each group on the pie:
+var pie = d3.pie()
+  .value(function(d) {return d.value; })
+
+var i;
+var da = [];
+for (i =0; i < data.length; i++ ){
+  da[i] = {"key": data[i].year, "value":data[i].fulltime_men_enrolled};
+
+}
+
+var data_ready = pie(da)
+
+var arcGenerator = d3.arc()
+  .innerRadius(0)
+  .outerRadius(radius)
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+svg
+  .selectAll('arc')
+  .data(data_ready)
+  .enter()
+  .append('path')
+  .attr('d', arcGenerator
+  )
+  .attr('fill', function(d){ return(color(d.data.key)) })
+  .attr("stroke", "black")
+  .style("stroke-width", "2px")
+ /* .append("g")
+  .attr("transform", "translate(" + (width / 2 - 120) + "," + 20 + ")")
+  .append("text")
+  .text("Amount of Fulltime Men Enrolled by Year")
+  .attr("class", "title");*/ 
+
+
+svg
+.selectAll('arc')  .
+data(data_ready)
+.enter()
+.append('text')
+.text(function(d){ return d.data.key})
+.attr("transform", function(d) {
+
+    return "translate(" + arcGenerator.centroid(d) +  ")"; 
+})
+.style("text-anchor", "middle")
+.style("font-size", 10)
+
+
+svg.append("text")
+        .attr("x", (width / 2 -200))             
+        .attr("y", (height / 2 -10))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px")  
+        .text("Amount of Fulltime Men that Applied By Year");
+  
+
+});
+</script>

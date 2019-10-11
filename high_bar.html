@@ -1,0 +1,70 @@
+  
+
+
+    <!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+    body{
+      margin-top: 30px;
+      margin-left:40px;
+    }
+/*Code Cite : http://www.knowstack.com/webtech/charts_demo*/
+
+    </style>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>    
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+  <script type="text/javascript">
+        $(function () {
+                var processed_json = new Array();   
+                $.getJSON('https://raw.githubusercontent.com/soumym/ucsd_dsc106_fa19/master/hw1/ucsd_common_converted.json', function(data) {
+                    // Populate series
+                    
+
+                    for (i = 0; i < data.length; i++){
+                        processed_json.push([data[0][data[0].length-1], +data[i][0]]);
+
+                    }
+                    console.log(processed_json)
+                 
+                    // draw chart
+                    $('#container').highcharts({
+                    chart: {
+                        type: "column"
+                    },
+                    title: {
+                        text: "People by Year"
+                    },
+                    xAxis: {
+                        type: 'category',
+                        allowDecimals: false,
+                        title: {
+                            text: "Year"
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: "Number of People"
+                        }
+                    },
+                    series: [{
+                      name: 'test',
+                        data: processed_json
+                    }]
+                }); 
+            });
+        });
+    </script>
+</head>
+<body>
+   <div style="width: 800px; margin: 2em auto; padding: 1em">
+  People by Year
+  </div>
+    <div id="container" style="height: 400px"></div>
+    
+</body>
+</html>
